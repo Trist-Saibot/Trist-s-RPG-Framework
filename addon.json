@@ -1,0 +1,12 @@
+{
+	"title"		:	"[TRF] - Trist's RPG Framework",
+	"type"		:	"ServerContent",
+	"info"		:	"A framework that allows for RPG style combat and inventory",
+	"tags"		:	[ "fun"],
+	"ignore"	:
+	[
+		"*.psd",
+		"*.vcproj",
+		"*.svn*"
+	]
+}
