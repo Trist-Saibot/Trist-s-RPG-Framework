@@ -1,0 +1,29 @@
+{
+    "MapID" : "Trist_Outside_Uncornered",
+    "Layer" : 1,
+    "Type"  : "uncornered",
+    "Mat"   : "trist_outside_UC.png",
+    "Tiles" : [
+        {
+            "x"       : 0,
+            "y"       : 0,
+            "canwalk" : false
+        },{
+            "x"       : 1,
+            "y"       : 0,
+            "canwalk" : false
+        },{
+            "x"       : 2,
+            "y"       : 0,
+            "canwalk" : false
+        },{
+            "x"       : 3,
+            "y"       : 0,
+            "canwalk" : false
+        },{
+            "x"       : 4,
+            "y"       : 0,
+            "canwalk" : false
+        }
+    ]
+}
