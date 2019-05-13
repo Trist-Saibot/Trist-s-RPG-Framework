@@ -21,8 +21,8 @@ tilemap.maps = {}
 
 
 function map:ProcessLayer(layer,MaterialName,isAnimated)
-    local renderTarget = GetRenderTargetEx("TRPG_" .. MaterialName,self.size * 32,self.size * 32, RT_SIZE_OFFSCREEN, MATERIAL_RT_DEPTH_NONE, 0, 0, IMAGE_FORMAT_RGBA8888)
-    render.PushRenderTarget(renderTarget, 0,0,self.size * 32,self.size * 32)
+    local renderTarget = GetRenderTargetEx("TRPG_" .. MaterialName,self.size * 32,self.size * 32, RT_SIZE_DEFAULT, MATERIAL_RT_DEPTH_NONE,1, 0, IMAGE_FORMAT_RGBA8888)
+    render.PushRenderTarget(renderTarget, 0,0,self.size * 32,self.size * 32) --point sampling is enabled to give it the pixel art look
     render.Clear(0,0,0,0,true) --THIS FIXES THINGS IF IT DOESN'T DRAW
 
     cam.Start2D()
@@ -35,7 +35,7 @@ function map:ProcessLayer(layer,MaterialName,isAnimated)
 
     cam.End2D()
 
-    --[[
+
     data = render.Capture({
     format = "jpeg",
         quality = 100,
@@ -47,7 +47,7 @@ function map:ProcessLayer(layer,MaterialName,isAnimated)
     f = file.Open( "MapData.jpg", "wb", "DATA" )
     f:Write( data )
     f:Close()
-    ]]
+
 
     render.PopRenderTarget()
 
@@ -65,9 +65,10 @@ function map:ProcessLayer(layer,MaterialName,isAnimated)
 end
 function map:RenderNonAnimated(layer)
     --draw all tiles here
-    for y = 0, map.size, 1 do
-        for x = 0, map.size, 1 do
+    for y = 0, map.size - 1, 1 do
+        for x = 0, map.size - 1, 1 do
             tilemap:RenderTile(x, y, 1)
+            --surface.DrawRect(x * 32,y * 32,32,32)
         end
     end
 end
@@ -83,8 +84,8 @@ function tilemap:LoadLayers()
     --TODO
     tilemap.layers[1] = {}
     tilemap.layers[1].data = {}
-    for x = 0,map.size,1 do
-        for y = 0,map.size,1 do
+    for x = 0,map.size - 1,1 do
+        for y = 0,map.size - 1,1 do
             tilemap:SetTile(x,y,1,"Trist_Outside_Cornered",1)
         end
     end
@@ -96,6 +97,8 @@ function tilemap:LoadLayers()
     tilemap:SetTile(2,3,1,"Trist_Outside_Cornered",2)
     tilemap:SetTile(2,4,1,"Trist_Outside_Cornered",2)
     tilemap:SetTile(3,3,1,"Trist_Outside_Cornered",2)
+
+    --tilemap:SetTile(31,31,1,"Trist_Outside_Cornered",2)
 
     for x = 5,7 do
         for y = 3,4 do
@@ -189,7 +192,7 @@ function tilemap:CheckSides(x,y,layer) --Checks each side of tile, return bitwis
         if (self:CompareTile(x,y,x - 1,y,layer) ) then --middle left
             bits = bit.bor(bits,ml) --adds middle left flag
         end
-        if ( y != map.size and self:CompareTile(x,y,x - 1,y + 1,layer) ) then --bottom left
+        if ( y != map.size - 1 and self:CompareTile(x,y,x - 1,y + 1,layer) ) then --bottom left
             bits = bit.bor(bits,bl) --adds bottom left flag
         end
     end
@@ -205,12 +208,12 @@ function tilemap:CheckSides(x,y,layer) --Checks each side of tile, return bitwis
         if ( self:CompareTile(x,y,x,y - 1,layer) ) then --top middle
             bits = bit.bor(bits,tm) --adds the top middle flag
         end
-        if ( x != map.size and self:CompareTile(x,y,x + 1,y - 1,layer) ) then --top right
+        if ( x != map.size - 1 and self:CompareTile(x,y,x + 1,y - 1,layer) ) then --top right
             bits = bit.bor(bits,tr) --adds the top right flag
         end
     end
 
-    if (x == map.size) then --check if we're at the right corner of the map
+    if (x == map.size - 1) then --check if we're at the right corner of the map
         bits = bit.bor(bits,tr) --adds the top right flag
         bits = bit.bor(bits,mr) --adds the middle right flag
         bits = bit.bor(bits,br) --adds the bottom right flag
@@ -221,12 +224,12 @@ function tilemap:CheckSides(x,y,layer) --Checks each side of tile, return bitwis
         if ( self:CompareTile(x,y,x + 1,y,layer) ) then --middle right
             bits = bit.bor(bits,mr) --adds the middle right flag
         end
-        if ( y != map.size and self:CompareTile(x,y,x + 1,y + 1,layer)) then --bottom right
+        if ( y != map.size - 1 and self:CompareTile(x,y,x + 1,y + 1,layer)) then --bottom right
             bits = bit.bor(bits,br) --adds the bottom right flag
         end
     end
 
-    if (y == map.size) then --checks if we're at the bottom corner of the map
+    if (y == map.size - 1) then --checks if we're at the bottom corner of the map
         bits = bit.bor(bits,bl) --adds the bottom left flag
         bits = bit.bor(bits,bm) --adds the bottom middle flag
         bits = bit.bor(bits,br) --adds the bottom right flag
@@ -237,7 +240,7 @@ function tilemap:CheckSides(x,y,layer) --Checks each side of tile, return bitwis
         if ( self:CompareTile(x,y,x,y + 1,layer) ) then --bottom middle
             bits = bit.bor(bits,bm) --adds the bottom middle flag
         end
-        if ( x != map.size and self:CompareTile(x,y,x + 1,y + 1,layer) ) then --bottom right
+        if ( x != map.size - 1 and self:CompareTile(x,y,x + 1,y + 1,layer) ) then --bottom right
             bits = bit.bor(bits,br) --adds the bottom right flag
         end
     end
@@ -249,7 +252,7 @@ function tilemap:GetTile(x,y,layer) --maintains consistency, this is the tile in
     return self.map[mapTile.MapID]
 end
 function tilemap:GetMapTile(x,y,layer) --this is the tile physically on the current map's layer
-    return tilemap.layers[layer].data[1 + x + y * 32]
+    return tilemap.layers[layer].data[1 + x + y * map.size]
 end
 function tilemap:CompareTile(x1,y1,x2,y2,layer)
     mt1 = self:GetMapTile(x1,y1,layer)
@@ -260,7 +263,7 @@ function tilemap:SetTile(x,y,layer,MapID,TileID)
     local tab = {}
     tab.MapID = MapID
     tab.TileID = TileID
-    tilemap.layers[layer].data[1 + x + y * 32] = tab
+    tilemap.layers[layer].data[1 + x + y * map.size] = tab
 end
 function tilemap:OffsetLookup(x,y,layer)
     local mapTile = self:GetMapTile(x,y,layer)
@@ -320,6 +323,14 @@ local mat = map:ProcessLayer(1,"Ground",false) --DEBUG todo render in window
 hook.Add("HUDPaint","trist_test",function()
     surface.SetMaterial(mat)
     surface.SetDrawColor(255,255,255,255)
-    surface.DrawTexturedRect(0, 0, map.size * 32, map.size * 32)
+    local t = 8
+    local adj = t * 2.025
+    local s = 32 * t - adj + t
+
+
+    surface.DrawTexturedRectUV(0,0,1024,1024,-adj / 1024,-adj / 1024,s / 1024,s / 1024) --DEBUG zooming in the map to view it
+
+
+    --surface.DrawTexturedRect(0, 0, 32 * map.size , 32 * map.size)
     --map:RenderNonAnimated(1)
 end)
