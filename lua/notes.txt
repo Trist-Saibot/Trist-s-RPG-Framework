@@ -1,0 +1,9 @@
+https://forums.rpgmakerweb.com/index.php?threads/autotile-tile-ids.2829/
+autotile information ^
+
+tiles have IDs spanning from 0 - 255
+0 - 127 are all autotiles,
+128 - 255 are are all A5
+
+https://rpgmaker.fixato.org/Manual/RPGVXAce/rpgvxace/6100_resource.html
+tile logic for A1

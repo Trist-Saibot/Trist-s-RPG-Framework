@@ -1,0 +1,17 @@
+{
+    "id"    : 0,
+    "mode"  : 3,
+    "name"  : "Mighty Pack Exterior",
+    "tileset_names" : [
+        "Ext-A1.png",
+        "Ext-A2.png",
+        "Ext-A3.png",
+        "Ext-A4.png",
+        "Ext-A5.png",
+        "Ext-B.png",
+        "Ext-C.png",
+        "",
+        ""
+    ],
+    "flags" : []
+}
