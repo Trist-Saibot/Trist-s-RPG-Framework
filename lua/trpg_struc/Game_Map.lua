@@ -38,9 +38,23 @@ end
 function Game_Map:valid(x,y)
     return x >= 0 and x < self:width() and y >= 0 and y < self:height()
 end
+function Game_Map:sides(x,y,z)
+    return self.map.data[x][y][z].sides or 0
+end
+function Game_Map:set_sides(x,y,z,sides)
+    if (self:valid(x,y,z)) then
+        if (!self.map.data[x][y][z]) then self.map.data[x][y][z] = {} end
+        self.map.data[x][y][z].sides = sides
+    end
+end
+function Game_Map:set_tile(x,y,z,tile_id)
+    if (self:valid(x,y,z)) then
+        if (!self.map.data[x][y][z]) then self.map.data[x][y][z] = {} end
+        self.map.data[x][y][z].tile_id = tile_id
+    end
+end
 function Game_Map:tile_id(x,y,z)
-    --todo, make auto table
-    return self.map.data[x][y][z] or -1
+    return self.map.data[x][y][z].tile_id or -1
 end
 function Game_Map:check_passage(x,y,bit) --return true if you can travel to specified tile
     --the bit variable shows the direction the player is moving from

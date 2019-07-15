@@ -1,8 +1,8 @@
 function TRPG:LoadTilesets()
-    local path = "materials/tristRPG/tilesets/"
+    local path = "materials/trpg/tilesets/"
     for _,set in ipairs(file.Find(path .. "tileset_*.json","GAME")) do
         local tab = util.JSONToTable(file.Read(path .. set,"GAME"))
-        local tileset = include("tristRPG/structs/Tileset.lua")
+        local tileset = include("trpg_struc/Tileset.lua")
         tileset.id = tab.id
         tileset.mode = tab.mode
         tileset.name = tab.name
@@ -16,31 +16,36 @@ function TRPG:LoadTilesets()
 end
 function TRPG:Load_Map(map_id)
 --HACKY TEMPORARY THING HERE
-    local map = include("tristRPG/structs/Map.lua")
+    local map = include("trpg_struc/Map.lua")
     map.display_name = "Trist's Test Map"
     map.map_id = map_id
     map.width = 32
     map.height = 32
     map.data = TRPG:Autotable(3)
     map.tileset_id = 0
-    --[[
     for x = 0,map.width do
         for y = 0,map.height do
             for i = 0,2 do
-                map.data[x][y][i] = -1
+                map.data[x][y][i] = {}
+                map.data[x][y][i].tile_id = -1
             end
         end
     end
-    ]]
     for x = 0,map.width do
         for y = 0,map.height do
-            map.data[x][y][0] = 32
+            map.data[x][y][0] = {}
+            map.data[x][y][0].tile_id = 16
         end
     end
     for x = 3,5 do
         for y = 3,5 do
-            map.data[x][y][0] = 17
+            map.data[x][y][0] = {}
+            map.data[x][y][0].tile_id = 17
         end
+    end
+    for x = 0,map.width do
+        map.data[x][5][1] = {}
+        map.data[x][5][1].tile_id = 22
     end
     return map
 end
