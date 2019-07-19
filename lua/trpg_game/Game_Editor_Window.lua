@@ -11,15 +11,18 @@ function editor:OpenEditor()
     curSelection.tile2 = nil
 
 
-    window:SetSize(1296,720)
+    window:SetSize(1312,720)
     window:Center()
     window:MakePopup()
 
-    local grid = vgui.Create("DGrid",window)
-    grid:SetPos(0,25)
+    dscG = vgui.Create("DScrollPanel",window)
+    dscG:SetPos(0,25)
+    dscG:SetSize(272,window:GetTall() - 25)
+    local grid = vgui.Create("DGrid")
+    grid:SetPos(0,0)
     grid:SetColWide(32)
     grid:SetCols(8)
-
+    dscG:AddItem(grid)
     for i = 0,15 do --A1 tiles
         local but = vgui.Create("DButton")
         but:SetText("")
@@ -27,8 +30,8 @@ function editor:OpenEditor()
         grid:AddItem(but)
         function but:DoClick()
             curSelection.tile0 = i
-            curSelection.tile1 = nil
-            curSelection.tile2 = nil
+            curSelection.tile1 = -1
+            curSelection.tile2 = -1
         end
         function but:Paint(w,h)
             surface.SetDrawColor(color_white)
@@ -44,12 +47,12 @@ function editor:OpenEditor()
         function but:DoClick()
             if ( (i % 8) < 4) then
                 curSelection.tile0 = i
-                curSelection.tile1 = nil
-                curSelection.tile2 = nil
+                curSelection.tile1 = -1
+                curSelection.tile2 = -1
             else
                 curSelection.tile0 = nil
                 curSelection.tile1 = i
-                curSelection.tile2 = nil
+                curSelection.tile2 = -1
             end
         end
         function but:Paint(w,h)
@@ -65,8 +68,8 @@ function editor:OpenEditor()
         grid:AddItem(but)
         function but:DoClick()
                 curSelection.tile0 = i
-                curSelection.tile1 = nil
-                curSelection.tile2 = nil
+                curSelection.tile1 = -1
+                curSelection.tile2 = -1
         end
         function but:Paint(w,h)
             surface.SetDrawColor(color_white)
@@ -74,9 +77,41 @@ function editor:OpenEditor()
             TRPG.Map_Renderer:RenderA3(0,0,i,0)
         end
     end
+    for i = 80,127 do --A4 tiles
+        local but = vgui.Create("DButton")
+        but:SetText("")
+        but:SetSize(32,32)
+        grid:AddItem(but)
+        function but:DoClick()
+                curSelection.tile0 = i
+                curSelection.tile1 = -1
+                curSelection.tile2 = -1
+        end
+        function but:Paint(w,h)
+            surface.SetDrawColor(color_white)
+            surface.SetMaterial(TRPG.curmap:GetMat(i))
+            TRPG.Map_Renderer:RenderA4(0,0,i,0)
+        end
+    end
+    for i = 128,255 do --A5 tiles
+        local but = vgui.Create("DButton")
+        but:SetText("")
+        but:SetSize(32,32)
+        grid:AddItem(but)
+        function but:DoClick()
+                curSelection.tile0 = i
+                curSelection.tile1 = -1
+                curSelection.tile2 = -1
+        end
+        function but:Paint(w,h)
+            surface.SetDrawColor(color_white)
+            surface.SetMaterial(TRPG.curmap:GetMat(i))
+            TRPG.Map_Renderer:RenderA5(0,0,i,0)
+        end
+    end
 
     dsc = vgui.Create("DScrollPanel",window)
-    dsc:SetPos(256,25)
+    dsc:SetPos(272,25)
     local ax, ay = dsc:GetPos()
     dsc:SetSize(window:GetWide() - ax,window:GetTall() - ay) --makes it so I can change these later without worrying about them
 

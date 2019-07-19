@@ -76,7 +76,7 @@ function Map_Renderer:RenderTile(x,y,tile_id,layer,map)
     elseif (tile_id < 80) then --A3
         self:RenderA3(x,y,tile_id,sides)
     elseif (tile_id < 128) then --A4
-        self:RenderA4(x,y,tile_id)
+        self:RenderA4(x,y,tile_id,sides)
     elseif (tile_id < 256) then --A5
         self:RenderA5(x,y,tile_id)
     elseif (tile_id < 512) then --B
@@ -106,7 +106,7 @@ function Map_Renderer:CheckSame(x,y,tile_id,layer,map)
         return map:tile_id(x,y,layer) == tile_id
     elseif (tile_id == 0) then --A1 tiles will connect to this range (0-3)
         local tile = map:tile_id(x,y,layer)
-        return tile < 4 and tile >= 0
+        return (tile < 4 and tile >= 0) or tile == 5 or tile == 7 or tile == 13 or tile == 15
     end
 end
 function Map_Renderer:RenderA1(x,y,tile_id,bits)
@@ -337,6 +337,92 @@ function Map_Renderer:DrawA3(x,y,tile_index,sides,offx,offy)
     local ev = ((offsets.y - 2) * 16 + ty + 16) / h
 
     surface.DrawTexturedRectUV(x * 32 + offx,y * 32 + offy,16,16,su,sv,eu,ev)
+end
+function Map_Renderer:RenderA4(x,y,tile_id,bits)
+    --top left
+    local sides = 0
+    local tile_index = tile_id - 80
+    local type = math.floor(tile_index / 8) % 2 == 1
+    if (bit.band(bits,tm) == tm) then sides = bit.bor(sides,tm) end --check for direction, and add it to sides
+    if (bit.band(bits,ml) == ml) then sides = bit.bor(sides,ml) end
+    if ((bit.band(bits,tl) == tl or type) and bit.band(bits,tm + ml) == tm + ml) then sides = bit.bor(sides,tl) end --only check if both are checked
+    if (sides == 0) then sides = "A2" end --cleanup edge cases
+    if (sides == ml) then sides = "A" .. ml end
+    if (sides == tm) then sides = "A" .. tm end
+    self:DrawA4(x,y,tile_index,sides,0,0)
+    --tilemap:DrawTile(x,y,layer,sides,0,0)
+
+    --top right
+    sides = 0
+    if (bit.band(bits,tm) == tm) then sides = bit.bor(sides,tm) end
+    if (bit.band(bits,mr) == mr) then sides = bit.bor(sides,mr) end
+    if ((bit.band(bits,tr) == tr or type) and bit.band(bits,mr + tm) == tm + mr) then sides = bit.bor(sides,tr) end
+    if (sides == 0) then sides = "B2" end
+    if (sides == mr) then sides = "B" .. mr end
+    if (sides == tm) then sides = "B" .. tm end
+    self:DrawA4(x,y,tile_index,sides,16,0)
+    --tilemap:DrawTile(x,y,layer,sides,16,0)
+
+    --bottom left
+    sides = 0
+    if (bit.band(bits,bm) == bm) then sides = bit.bor(sides,bm) end
+    if (bit.band(bits,ml) == ml) then sides = bit.bor(sides,ml) end
+    if ((bit.band(bits,bl) == bl or type) and bit.band(bits,ml + bm) == ml + bm) then sides = bit.bor(sides,bl) end
+    if (sides == 0) then sides = "C2" end
+    if (sides == ml) then sides = "C" .. ml end
+    if (sides == bm) then sides = "C" .. bm end
+    self:DrawA4(x,y,tile_index,sides,0,16)
+    --tilemap:DrawTile(x,y,layer,sides,0,16)
+
+    --bottom right
+    sides = 0
+    if (bit.band(bits,bm) == bm) then sides = bit.bor(sides,bm) end
+    if (bit.band(bits,mr) == mr) then sides = bit.bor(sides,mr) end
+    if ((bit.band(bits,br) == br or type) and bit.band(bits,mr + bm) == bm + mr) then sides = bit.bor(sides,br) end
+    if (sides == 0) then sides = "D2" end
+    if (sides == mr) then sides = "D" .. mr end
+    if (sides == bm) then sides = "D" .. bm end
+    self:DrawA4(x,y,tile_index,sides,16,16)
+    --tilemap:DrawTile(x,y,layer,sides,16,16)
+end
+function Map_Renderer:DrawA4(x,y,tile_index,sides,offx,offy) --should work for A2 and A1 but you'll have to iterate somehow on A1
+    local ty = {}
+    ty[0] = 0
+    ty[1] = 64
+    ty[2] = 64 + 96
+    ty[3] = 64 * 2 + 96
+    ty[4] = 64 * 2 + 96 * 2
+    ty[5] = 64 * 3 + 96 * 2
+    local i = math.floor(tile_index / 8)
+    local tx = tile_index % 8 * 64 --texture offset
+
+    local w = 512
+    local h = 512
+
+    local offsets = autotile_map[sides]
+    local su = (offsets.x * 16 + tx) / w --Start X; this needs to be a number from 0 - 1
+    local sv = (offsets.y * 16 + ty[i]) / h --Start Y
+    local eu = (offsets.x * 16 + tx + 16) / w
+    local ev = (offsets.y * 16 + ty[i] + 16) / h
+
+    surface.DrawTexturedRectUV(x * 32 + offx,y * 32 + offy,16,16,su,sv,eu,ev)
+end
+function Map_Renderer:RenderA5(x,y,tile_id)
+    local tile_index = tile_id - 128
+
+    local tx = tile_index % 8 * 32 --texture offset
+    local ty = math.floor(tile_index / 8) * 32 --texture offset
+
+    local w = 256
+    local h = 512
+
+    local su = tx / w --Start X; this needs to be a number from 0 - 1
+    local sv = ty / h --Start Y
+    local eu = (tx + 32) / w
+    local ev = (ty + 32) / h
+
+    surface.DrawTexturedRectUV(x * 32,y * 32,32,32,su,sv,eu,ev)
+
 end
 function Map_Renderer:UpdateSurrounding(x,y,map)
     local renderTarget = GetRenderTargetEx("TRPG_Map",map:width() * 32,map:height() * 32, RT_SIZE_DEFAULT, MATERIAL_RT_DEPTH_NONE,1, 0, IMAGE_FORMAT_RGBA8888)
