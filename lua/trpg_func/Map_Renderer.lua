@@ -422,7 +422,26 @@ function Map_Renderer:RenderA5(x,y,tile_id)
     local ev = (ty + 32) / h
 
     surface.DrawTexturedRectUV(x * 32,y * 32,32,32,su,sv,eu,ev)
+end
+function Map_Renderer:RenderB(x,y,tile_id)
+    local tile_index = tile_id - 256
+    local tile_off = 0
+    if (tile_index >= 128) then --read one line going down, then reset and read the next line. Basically, two A5 sets next to eachother.
+        tile_index = tile_index - 128
+        tile_off = 1
+    end
+    local tx = (tile_off * 256) + (tile_index % 8 * 32) --texture offset
+    local ty = math.floor(tile_index / 8 ) * 32 --texture offset
 
+    local w = 512
+    local h = 512
+
+    local su = tx / w --Start X; this needs to be a number from 0 - 1
+    local sv = ty / h --Start Y
+    local eu = (tx + 32) / w
+    local ev = (ty + 32) / h
+
+    surface.DrawTexturedRectUV(x * 32,y * 32,32,32,su,sv,eu,ev)
 end
 function Map_Renderer:UpdateSurrounding(x,y,map)
     local renderTarget = GetRenderTargetEx("TRPG_Map",map:width() * 32,map:height() * 32, RT_SIZE_DEFAULT, MATERIAL_RT_DEPTH_NONE,1, 0, IMAGE_FORMAT_RGBA8888)

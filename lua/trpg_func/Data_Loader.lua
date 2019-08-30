@@ -31,6 +31,7 @@ function TRPG:Load_Map(map_id)
             end
         end
     end
+
     for x = 0,map.width do
         for y = 0,map.height do
             map.data[x][y][0] = {}
@@ -47,6 +48,7 @@ function TRPG:Load_Map(map_id)
         map.data[x][5][1] = {}
         map.data[x][5][1].tile_id = 22
     end
+
     return map
 end
 --https://stackoverflow.com/questions/21229211/three-dimensional-table-in-lua

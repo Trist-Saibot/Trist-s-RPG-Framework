@@ -109,6 +109,22 @@ function editor:OpenEditor()
             TRPG.Map_Renderer:RenderA5(0,0,i,0)
         end
     end
+    for i = 256,511 do --B tiles
+        local but = vgui.Create("DButton")
+        but:SetText("")
+        but:SetSize(32,32)
+        grid:AddItem(but)
+        function but:DoClick()
+                curSelection.tile0 = nil
+                curSelection.tile1 = nil
+                curSelection.tile2 = i
+        end
+        function but:Paint(w,h)
+            surface.SetDrawColor(color_white)
+            surface.SetMaterial(TRPG.curmap:GetMat(i))
+            TRPG.Map_Renderer:RenderB(0,0,i,0)
+        end
+    end
 
     dsc = vgui.Create("DScrollPanel",window)
     dsc:SetPos(272,25)
